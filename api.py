@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Path, HTTPException
 from fastapi.responses import JSONResponse
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
