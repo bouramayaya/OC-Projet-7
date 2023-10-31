@@ -5,8 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
 import pickle
 import shap
-import uvicorn
-import os
+# from routers import ToolsRoutes
 
 # Instanciation de l'API
 app = FastAPI()
@@ -229,6 +228,5 @@ def shap_values():
         'shap_values_1': shap_val[1].tolist()
     }
 
-   
-if __name__ == '__main__':
-    uvicorn.run(app,  host='127.0.0.1', port=8000)
+# app.include_router(ToolsRoutes.router)   
+
