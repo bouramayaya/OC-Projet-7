@@ -19,10 +19,11 @@ app = FastAPI()
 import pickle
 import requests
 
+
 def charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele):
     url = f"https://raw.githubusercontent.com/{nom_utilisateur}/{nom_repo}/master/{chemin_fichier_modele}"
     response = requests.get(url)
-    
+
     if response.status_code == 200:
         contenu_modele = response.content
         modele_charge = pickle.loads(contenu_modele)
@@ -33,13 +34,13 @@ def charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele):
         print(f"Message d'erreur complet : {response.text}")
         return None
 
+
 # Exemple d'utilisation
 nom_utilisateur = "bouramayaya"
 nom_repo = "OC-Projet-7"
 chemin_fichier_modele = "model/best_LGBMClassifier.pkl"
 
 model = charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele)
-
 
 # ------------------------------------------------------------------------------------------------------------
 # Chargement des données
@@ -48,7 +49,8 @@ import pandas as pd
 import requests
 from io import StringIO
 
-def charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, mot_cle):
+
+def charger_et_concatener_fichiers_github(nom_utilisateur: str, nom_repo, chemin_dossier, mot_cle):
     url = f"https://api.github.com/repos/{nom_utilisateur}/{nom_repo}/contents/{chemin_dossier}"
     response = requests.get(url)
     fichiers_csv = []
@@ -60,16 +62,17 @@ def charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_doss
                 contenu = requests.get(fichier["download_url"]).text
                 dataframe = pd.read_csv(StringIO(contenu))
                 fichiers_csv.append(dataframe)
-        
+
         if not fichiers_csv:
             print(f"Aucun fichier contenant le mot-clé '{mot_cle}' n'a été trouvé dans le dossier GitHub.")
             return None
-        
+
         dataframe_concatene = pd.concat(fichiers_csv, axis=0, ignore_index=True)
         return dataframe_concatene.set_index('SK_ID_CURR')
     else:
         print(f"Erreur lors de la récupération des fichiers : {response.status_code}")
         return None
+
 
 nom_utilisateur = "bouramayaya"
 nom_repo = "OC-Projet-7"
@@ -78,8 +81,6 @@ chemin_dossier = "data"
 data       = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
 data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
 X_train    = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
-
-
 
 # os.chdir('C:/Users/Fane0763/OpenClassroom/OC Projet 7/out_put')
 # df_id = pd.read_csv('C:/Users/Fane0763/OpenClassroom/OC Projet 7/bases/application_test.csv')
@@ -107,7 +108,7 @@ data_train_scaled = data_train.copy()
 data_train_scaled[cols] = scaler.transform(data_train_scaled[cols])
 
 # Initialisation de l'explainer Shapley pour les valeurs locales
-explainer = shap.TreeExplainer(model)
+explainer = shap.Explainer(model)
 
 
 # try:
@@ -118,7 +119,8 @@ explainer = shap.TreeExplainer(model)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
-    return JSONResponse(status_code=exc.status_code, content={"message": exc.detail})
+    return JSONResponse(status_code=exc.status_code,
+                        content={"message": exc.detail})
 
 
 @app.get('/')
@@ -170,9 +172,9 @@ def get_data_voisins(client_id: int):
     reference_observation = data_scaled[data_scaled.index == reference_id][features].values
     indices = nn.kneighbors(reference_observation, return_distance=False)
     # print(indices)
-    df_voisins = list(data_train.iloc[indices[0], :].index) # data_train.iloc[indices[0], :].index
+    df_voisins = list(data_train.iloc[indices[0], :].index)  # data_train.iloc[indices[0], :].index
     print(df_voisins)
-    return df_voisins # df_voisins.to_json()
+    return df_voisins  # df_voisins.to_json()
 
 
 # @app.get('/shaplocal/{client_id}')
@@ -186,10 +188,10 @@ def get_data_voisins(client_id: int):
 # 
 #     client_data = client_data
 #     shap_val = explainer.shap_values(client_data)[0][:, 1]
-    # Suppose explainer is your SHAP explainer object and client_data is your input data
-    # explainer = shap.Explainer(model)  # Replace model with your trained LGBM model
-    # shap_val = explainer.shap_values(client_data)  # Calculate SHAP values for the input data
-    # base_value = explainer.expected_value  # Get the expected value of the model as the base value
+# Suppose explainer is your SHAP explainer object and client_data is your input data
+# explainer = shap.Explainer(model)  # Replace model with your trained LGBM model
+# shap_val = explainer.shap_values(client_data)  # Calculate SHAP values for the input data
+# base_value = explainer.expected_value  # Get the expected value of the model as the base value
 
 
 @app.get('/shaplocal/{client_id}')
@@ -205,9 +207,9 @@ def shap_values_local(client_id: int):
     shap_val = explainer.shap_values(client_data)[0][:, 1]
 
     return {
-        'shap_values': shap_val.tolist(),
-        'base_value': explainer.expected_value,
-        'data': client_data.values.tolist(),
+        'shap_values'  : shap_val.tolist(),
+        'base_value'   : explainer.expected_value,
+        'data'         : client_data.values.tolist(),
         'feature_names': client_data.columns.tolist()
     }
     # return {
@@ -228,7 +230,5 @@ def shap_values():
         'shap_values_0': shap_val[0].tolist(),
         'shap_values_1': shap_val[1].tolist()
     }
-
-   
 if __name__ == '__main__':
-    uvicorn.run(app,  host='127.0.0.1', port=8000)
+    uvicorn.run(app, host='127.0.0.1', port=8000)
