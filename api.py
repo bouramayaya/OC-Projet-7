@@ -231,7 +231,7 @@ def shap_values():
         'shap_values_1': shap_val[1].tolist()
     }
 
-# app.include_router(ToolsRoutes.router)  
-if __name__ == '__main__':
-    uvicorn.run(app,  host='127.0.0.1', port=8000)
+# # app.include_router(ToolsRoutes.router)  
+# if __name__ == '__main__':
+#     uvicorn.run(app,  host='127.0.0.1', port=8000)
 
