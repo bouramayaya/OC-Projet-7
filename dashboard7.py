@@ -25,7 +25,7 @@ app = Dash(__name__, suppress_callback_exceptions=True)
 # app = dash.Dash(__name__)
 
 # URL de l'API
-API_URL = "http://127.0.0.1:8000/"  # "https://votre-url-d-api.herokuapp.com/"
+API_URL = "http://3.84.177.36:8000/" #  "http://127.0.0.1:8000/"  "https://votre-url-d-api.herokuapp.com/"
 
 # Chargement des données
 import os
