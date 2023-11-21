@@ -73,14 +73,15 @@ nom_utilisateur = "bouramayaya"
 nom_repo = "OC-Projet-7"
 chemin_dossier = "data"
 
-# data = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
-# data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
-# X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
+data = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
+data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
+X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
 
-os.chdir(os.getcwd()) # 'C:/Users/Fane0763/OpenClassroom/OC Projet 7'
-data_train = pd.read_csv('data/train_df.csv').set_index('SK_ID_CURR')
-data = pd.read_csv('data/test_df.csv').set_index('SK_ID_CURR')
-X_train = pd.read_csv('data/X_train.csv').set_index('SK_ID_CURR')
+# path=os.getcwd()
+# os.chdir(path) # 'C:/Users/Fane0763/OpenClassroom/OC Projet 7'
+# data_train = pd.read_csv('/data/train_df.csv').set_index('SK_ID_CURR')
+# data = pd.read_csv('/data/test_df.csv').set_index('SK_ID_CURR')
+# X_train = pd.read_csv('/data/X_train.csv').set_index('SK_ID_CURR')
 
 
 
