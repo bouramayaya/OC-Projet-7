@@ -1,39 +1,29 @@
 # Importation des bibliothèques Dash et Plotly
-
-# -------------------------------------------------------------------------
-# pip install dash
-# python.exe -m pip install --upgrade pip
-# pip install  pandas matplotlib pillow requests scikit-learn  plotly dash
-# -------------------------------------------------------------------------
-
+import dash
+from dash import dcc, html
 from dash import Dash, dcc, html, Input, Output, State
 from dash.exceptions import PreventUpdate
-import shap
-# import matplotlib.pyplot as plt
-
-# from PIL import Image
-import pandas as pd
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-import requests
-import plotly.graph_objects as go
 import plotly.express as px
+import requests
+import pandas as pd
+import plotly.graph_objects as go
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import pickle
+import shap
+import numpy as np
 
-
-# Initialisation de l'application Dash
-app = Dash(__name__, suppress_callback_exceptions=True)
-# app = dash.Dash(__name__)
 
 # URL de l'API
-API_URL = "http://3.84.177.36:8000/" #  "http://127.0.0.1:8000/"  "https://votre-url-d-api.herokuapp.com/"
+API_URL = 'http://127.0.0.1:8000/'  # "http://3.84.177.36:8000/"  # Remplacez par votre URL d'API
+
 
 # Chargement des données
 import os
 
 os.chdir('C:/Users/Fane0763/OpenClassroom/OC Projet 7')
 data_train = pd.read_csv('./out_put/train_df.csv').set_index('SK_ID_CURR')
-data_test  = pd.read_csv('./out_put/test_df.csv').set_index('SK_ID_CURR')
-X_train    = pd.read_csv('./out_put/X_train.csv').set_index('SK_ID_CURR')
+data_test = pd.read_csv('./out_put/test_df.csv').set_index('SK_ID_CURR')
+X_train = pd.read_csv('./out_put/X_train.csv').set_index('SK_ID_CURR')
 
 X_train = pd.read_csv('./out_put/X_train.csv').set_index('SK_ID_CURR')
 cols = X_train.select_dtypes(['float64']).columns
@@ -52,26 +42,24 @@ data_test_scaled[cols] = scaler.transform(data_test_scaled[cols])
 data_train_scaled = data_train[listvar].copy()
 data_train_scaled[cols] = scaler.transform(data_train[cols])
 
-
 # Chargement du modèle et des données
 model = pickle.load(open('C:/Users/Fane0763/OpenClassroom/OC Projet 7/Models/best_LGBMClassifier.pkl', 'rb'))
 
 # Initialisation de l'explainer Shapley pour les valeurs locales
-explainer = shap.TreeExplainer(model)
+explainer = shap.Explainer(model)
 
-# Fonction de prétraitement des données
-def preprocessing(df, scaler_type):
-    cols = df.select_dtypes(['float64']).columns
-    df_scaled = df.copy()
-    if scaler_type == 'minmax':
-        scaler = MinMaxScaler()
-    else:
-        scaler = StandardScaler()
+import dash_bootstrap_components as dbc
 
-    df_scaled[cols] = scaler.fit_transform(df[cols])
-    return df_scaled
+# Initialisation de l'application Dash
+# app = Dash(__name__, suppress_callback_exceptions=True)
+
+bootstrap_theme = [dbc.themes.BOOTSTRAP, 'https://use.fontawesome.com/releases/v5.9.0/css/all.css']
+app = Dash(__name__, external_stylesheets=bootstrap_theme, title="Dashboard Prêt à depenser")
+server = app.server
+app.config.suppress_callback_exceptions = True
 
 
+#  Quelques fonctions utiles pour le dashboard.
 # Fonction pour obtenir la prédiction
 def get_prediction(client_id):
     url_get_pred = API_URL + "prediction/" + str(client_id)
@@ -81,20 +69,6 @@ def get_prediction(client_id):
     decision = "Refusé" if proba_default >= best_threshold else "Accordé"
     return proba_default, decision
 
-# def get_prediction(client_id):
-#     try:
-#         url_get_pred = API_URL + "prediction/" + str(client_id)
-#         response = requests.get(url_get_pred)
-#         response.raise_for_status()  # Lève une exception si la requête échoue (status code >= 400)
-#         proba_default = round(float(response.content), 3)
-#         best_threshold = 0.5
-#         decision = "Refusé" if proba_default >= best_threshold else "Accordé"
-#         return proba_default, decision
-#     except Exception as e:
-#         print(f"Erreur lors de la récupération des données de l'API : {e}")
-#         return None, "Erreur lors de la récupération des données"
-
-
 # Fonction pour afficher la jauge de score
 def plot_score_gauge(proba):
     fig = go.Figure(go.Indicator(
@@ -102,95 +76,17 @@ def plot_score_gauge(proba):
         value=proba * 100,
         mode="gauge+number+delta",
         title={'text': "Jauge de score"},
-        delta={'reference': 54},
+        delta={'reference': 50},
         gauge={'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "black"},
                'bar': {'color': "MidnightBlue"},
                'steps': [
                    {'range': [0, 20], 'color': "Green"},
                    {'range': [20, 45], 'color': "LimeGreen"},
-                   {'range': [45, 54], 'color': "Orange"},
-                   {'range': [54, 100], 'color': "Red"}],
+                   {'range': [45, 50], 'color': "Orange"},
+                   {'range': [50, 100], 'color': "Red"}],
                'threshold': {'line': {'color': "brown", 'width': 4}, 'thickness': 1,
-                             'value': 54}}))
+                             'value': 50}}))
     return fig
-
-
-def plot_score_gauge2(proba):
-    # Créez les seuils pour les couleurs
-    thresholds = [0, 20, 45, 54, 100]
-    colors = ["Green", "LimeGreen", "Orange", "Red"]
-
-    # Créez un DataFrame contenant les données pour la jauge
-    df = pd.DataFrame({
-        'proba': [proba * 100],
-        'threshold': [50]  # Référence pour la jauge
-    })
-
-    # Créez le graphique de jauge avec Plotly Express
-    fig = px.indicator(
-        df,
-        title="Jauge de score",
-        gauge={
-            'axis': {'range': [None, 100]},
-            'bar': {'color': "MidnightBlue"},
-            'steps': [
-                {'range': [0, thresholds[0]], 'color': colors[0]},
-                {'range': [thresholds[0], thresholds[1]], 'color': colors[1]},
-                {'range': [thresholds[1], thresholds[2]], 'color': colors[2]},
-                {'range': [thresholds[2], thresholds[3]], 'color': colors[3]}
-            ],
-            'threshold': {
-                'line': {'color': "brown", 'width': 4},
-                'thickness': 1,
-                'value': df['threshold'].iloc[0]
-            }
-        },
-        template='plotly_dark'
-    )
-
-    # Masquez les légendes et l'échelle de couleur
-    fig.update_traces(showlegend=False)
-    fig.update_coloraxes(colorbar=dict(visible=False))
-
-    return fig
-
-# Graphique Shapley
-import plotly.express as px
-
-def generate_local_interpretation_graph(client_id):
-    if client_id is None:
-        raise PreventUpdate  # Si aucun client n'est sélectionné, empêchez la mise à jour du graphique
-
-    # Obtenez l'indice correspondant au client sélectionné (assurez-vous que data_test.index est une liste d'ID clients)
-    client_index = data_test.index.get_loc(client_id)
-
-    # Sélectionnez les valeurs SHAP pour le client spécifique
-    client_data = data_test_scaled[data_test_scaled.index == client_id]
-    shap_values_client = explainer.shap_values(client_data)[0]
-
-    # Créez un DataFrame contenant les caractéristiques et les valeurs SHAP pour le client
-    shap_df = pd.DataFrame(data={
-        'Feature': client_data.columns,  # Noms des caractéristiques
-        'SHAP Value': shap_values_client[0]  # Valeurs SHAP pour le client
-    })
-
-    # Triez le DataFrame par valeurs SHAP (optionnel)
-    shap_df = shap_df.sort_values(by='SHAP Value', ascending=False)
-
-    # Créez un graphique à barres horizontales avec Plotly Express
-    shap_graph = px.bar(
-        shap_df,
-        x='SHAP Value',
-        y='Feature',
-        orientation='h',
-        labels={'SHAP Value': 'Valeur SHAP', 'Feature': 'Caractéristique'},
-        title='Interprétation locale - Valeurs SHAP'
-    )
-
-    # Retournez le graphique SHAP pour l'onglet 'local_interpretation'
-    return shap_graph
-
-
 
 
 # Mise en page de l'application Dash
@@ -200,10 +96,10 @@ app.layout = html.Div([
 
     # Menu déroulant pour sélectionner l'ID du client
     dcc.Dropdown(
-        id='client-dropdown',
-        options=[{'label': str(id_client_dash), 'value': id_client_dash} for id_client_dash in data_test.index],
-        value=None,  # Valeur par défaut, vous pouvez la changer si nécessaire
-        placeholder='Sélectionnez un client'
+        id          = 'client-dropdown',
+        options     = [{'label': str(id_client_dash), 'value': id_client_dash} for id_client_dash in data_test.index],
+        value       = data_test.index[0], # None,  # Valeur par défaut, vous pouvez la changer si nécessaire
+        placeholder = 'Sélectionnez un client'
     ),
 
     # Contenu dynamique basé sur les onglets
@@ -211,21 +107,19 @@ app.layout = html.Div([
         dcc.Tab(label='Home', value='home'),
         dcc.Tab(label='Information du client', value='client_info'),
         dcc.Tab(label='Interprétation locale', value='local_interpretation'),
-        dcc.Tab(label='Interprétation globale', value='global_interpretation')
+        dcc.Tab(label='Interprétation globale', value='global_interpretation'),
     ]),
-
     # Contenu spécifique aux onglets
     html.Div(id='tab-content')
-])
-
-
+],
+    style={"padding": "10px"}
+)
 # Fonction de mise à jour du contenu des onglets
 @app.callback(Output('tab-content', 'children'),
               [Input('tabs', 'value')])
 
 def update_tab(tab_name):
     if tab_name == 'home':
-
         return html.Div([
             html.H2("Bienvenue sur le tableau de bord Prêt à dépenser"),
             html.Div([
@@ -239,14 +133,13 @@ def update_tab(tab_name):
                              "- **Information du client**: Vous pouvez y retrouver toutes les informations rel"
                              "selectionné dans la colonne de gauche, ainsi que le résultat de sa demande de cr"
                              "Je vous invite à accéder à cette page afin de commencer.\n"
-                             "- **Interprétation locale**: Vous pouvez y retrouver quelles caractéristiques du"
+                             "- **Interprétation locale**: Vous pouvez y retrouver quelles caractéristiques du client qui ont "
                              "influencé le choix d'approbation ou refus de la demande de crédit.\n"
                              "- **Intérprétation globale**: Vous pouvez y retrouver notamment des comparaisons"
                              "les autres clients de la base de données ainsi qu'avec des clients similaires.")
             ])
         ])
     elif tab_name == 'client_info':
-        # ... (contenu de la page Information du client)
         return [
             html.H2("Information du client"),
             html.Div([
@@ -257,20 +150,43 @@ def update_tab(tab_name):
         ]        
 
     elif tab_name == 'local_interpretation':
-        # ... (contenu de la page Interprétation locale)
-        # interpretation_graph = generate_local_interpretation_graph(client_id) 
-        return html.Div([
-            html.H2("Interprétation locale"),
-            # html.Div(id='shap_graph'),
-            html.Div(id='shap-graph') 
-        ])
+        return [
+            html.Div("Explore l'influence de chaque caractéristique (variables) sur la probabilité d'octroi ou de refus du crédit", 
+                     style={"text-align": "center"}),
+            # html.Div(id='shap-graph'),
+            dcc.Graph(id='shap-waterfall-plot'), 
+        ]
     
     elif tab_name == 'global_interpretation':
-        # ... (contenu de la page Interprétation globale)
-        return html.Div([
-            html.H2("Interprétation globale"),
-            # ... (contenu de la page Interprétation globale)
-        ])
+        return [
+            # html.H2("Interprétation globale", style={"text-align": "center"}),
+            html.H2("Analyse features importances", style={"text-align": "center"}),
+            dcc.Graph(id='feature-importance-plot'),
+
+            html.H2("Analyse sur les clients similaires (Voisins)", style={"text-align": "center"}), 
+            html.Div([
+                html.Label("Choix de  l'abscisse X"),
+                dcc.Dropdown(
+                    id='feature1-dropdown',
+                    options=[{'label': col, 'value': col} for col in data_test.columns],
+                    value=data_test.columns[0],  # Valeur par défaut, colonne 0
+                    placeholder='Sélectionnez Feature 1'
+                ),
+            ], style={'width': '48%', 'display': 'inline-block', 'margin-right': '2%'}), 
+
+            html.Div([                
+                html.Label("Choix de l'ordonnée Y"),
+                dcc.Dropdown(
+                    id='feature2-dropdown',
+                    options=[{'label': col, 'value': col} for col in data_test.columns],
+                    value=data_test.columns[4],  # Valeur par défaut, colonne 4
+                    placeholder="Selectionnez l'ordonnée (Y)"
+                ),
+            ], style={'width': '48%', 'display': 'inline-block'}),            
+            # Conteneur pour le graphique Scatter Plot
+            dcc.Graph(id='scatter-plot'),
+        ]
+
 # Callback pour mettre à jour les informations du client
 @app.callback(
     Output('client-info-expander-output', 'children'),
@@ -283,15 +199,17 @@ def update_client_info_expander(n_clicks, client_id):
     else:
         client_info = pd.DataFrame(data_test.loc[data_test.index == client_id])
         return html.Div([
+            html.Br(),
             html.Div("Voici les informations du client:"),
+            html.Br(),
             dcc.Markdown(client_info.to_markdown())
         ])
-            
-# Fonction de mise à jour de la sortie de la prédiction
+
+
+# Callback pour mettre à jour la sortie de la prédiction
 @app.callback(Output('prediction-output', 'children'),
               [Input('start-button', 'n_clicks')],
               [State('client-dropdown', 'value')])
-
 def update_prediction_output(n_clicks, client_id):
     if n_clicks is None:
         return ''
@@ -313,65 +231,192 @@ def update_prediction_output(n_clicks, client_id):
         else:
             return ''
 
-# Callback pour mettre à jour interpretabilité
-# @app.callback(
-#     Output('shap_graph', 'figure'),
-#     [Input('client-dropdown', 'value')]
-# )
 
+# Callback pour mettre à jour le graphique SHAP
 @app.callback(
-    Output('shap-graph', 'children'),
+    Output('shap-graph', 'figure'),
     [Input('client-dropdown', 'value')]
 )
 def update_shap_graph(client_id):
+    shap.initjs()
+    if client_id is None:
+        raise PreventUpdate  # If no client is selected, prevent the graph update
+
+    client_index = data_test.index.get_loc(client_id)
+    client_data = data_test_scaled[data_test_scaled.index == client_id]
+    feature_names = data_test.columns.tolist()
+
+    shap_values_client = explainer.shap_values(client_data)[0][0]
+    
+    # Appel à l'API pour récupérer les shap_values
+    shap_api_url = f"{API_URL}shaplocal/{client_id}"
+    response = requests.get(shap_api_url)
+
+    if response.status_code == 200:
+        shap_data          = response.json()
+        # shap_values_client = shap_data['shap_values'][0]
+
+        print('shap_values_client :', len(shap_data['shap_values'][0]))
+        print('shap_data          :', len(shap_data['data'][0]))
+        print('shap_values_client :', print(shap_values_client))
+
+        # Create a Plotly figure using the extracted information
+        shap_graph = shap.force_plot(
+            explainer.expected_value[0],
+            shap_values_client,
+            data_test.iloc[client_index, :],
+            feature_names=feature_names,
+            matplotlib=True  # Set matplotlib to False to ensure it returns a Plotly figure
+        )
+         # Convert the AdditiveForceVisualizer object to a Plotly figure
+        # shap_fig = shap_graph.data[0].to_plotly()
+
+        # Return the Plotly figure dcc.Graph(figure=shap_graph)
+        return shap_graph
+    else:
+        raise PreventUpdate
+
+# Callback to update the feature importance plot
+@app.callback(
+    Output('feature-importance-plot', 'figure'),
+    [Input('client-dropdown', 'value')]
+)
+def update_feature_importance_plot(client_id):
+    if client_id is None:
+        raise PreventUpdate  # If no client is selected, prevent the graph update
+
+    # Calculate feature importance
+    feature_imp = pd.DataFrame(
+        sorted(zip(model.booster_.feature_importance(importance_type='gain'), X_train.columns)),
+        columns=['Value', 'Feature']
+    )
+
+    # Create a bar plot
+    feature_importance_plot = px.bar(
+        feature_imp.sort_values(by="Value", ascending=True).tail(10),
+        x="Value",
+        y="Feature",
+        orientation='h',
+        title='Features Importances (10 prémières variables)',
+    )
+        # Update layout to center title and set font style
+    feature_importance_plot.update_layout(
+        title=dict(
+            # text='Features Importances (10 premières variables)',
+            x=0.5,  # Center the title
+            font=dict(size=16,  # Set font size
+                      family='Arial',  # Set font family
+                      color='black'),  # Set font color : '#1f77b4'
+            ),
+    )
+    return feature_importance_plot
+
+# Callback pour mettre à jour le graphique Shap waterfall_plot
+@app.callback(
+    Output('shap-waterfall-plot', 'figure'),
+    [Input('client-dropdown', 'value')]
+)
+def update_shap_waterfall_plot(client_id):
+    shap.initjs()
     if client_id is None:
         raise PreventUpdate  # Si aucun client n'est sélectionné, empêchez la mise à jour du graphique
 
-    # Obtenez l'indice correspondant au client sélectionné (assurez-vous que data_test.index est une liste d'ID clients)
-    # client_index = data_test.index.get_loc(client_id)
-    # Sélectionnez les valeurs SHAP pour le client spécifique
-    data = data_test_scaled[data_test_scaled.index == client_id]
+    # Appel à l'API pour récupérer les shap_values
+    shap_api_url = f"{API_URL}shaplocal/{client_id}"
+    response = requests.get(shap_api_url)
 
-    # Créez un graphique à barres horizontal avec Plotly Express (à titre d'exemple)
-    shap_graph = px.bar(
-        data,  # Remplacez 'data' par les données que vous souhaitez afficher dans le graphique
-        x='Feature',  # Remplacez 'Feature' par le nom de votre caractéristique
-        y='SHAP Value',  # Remplacez 'SHAP Value' par le nom de votre valeur SHAP
-        orientation='h',
-        labels={'SHAP Value': 'Valeur SHAP', 'Feature': 'Caractéristique'},
-        title='Interprétation locale - Valeurs SHAP'
-    )
+    if response.status_code == 200:
+        shap_data = response.json()
 
-    # Retournez le graphique SHAP pour l'onglet 'local_interpretation'
-    return dcc.Graph(figure=shap_graph)
+        # Obtenez les valeurs Shap
+        shap_values_client = shap_data['shap_values'][0]
+        feature_names      = shap_data['feature_names'][:10]  # Utilisez uniquement les 10 premières variables
+        expected_value     = explainer.expected_value[0]
+
+        # Calculez les contributions cumulatives
+        cumulative_shap_values = np.cumsum(shap_values_client[:10])  # Utilisez uniquement les 10 premières valeurs
+
+        # Créez un graphique waterfall_plot avec Plotly
+        shap_waterfall_plot = go.Figure()
+
+        shap_waterfall_plot.add_trace(go.Waterfall(
+            orientation="v",
+            measure=["absolute"] + ["relative"] * (len(feature_names) - 1),
+            x=feature_names,
+            y=cumulative_shap_values,
+            connector={"line":{"color":"rgb(63, 63, 63)"}},
+            textposition="outside",
+            decreasing={"marker":{"color":"Maroon", "line":{"color":"red", "width":2}}},
+            increasing={"marker":{"color":"Teal"}},
+            totals={"marker":{"color":"deep sky blue", "line":{"color": "blue", "width": 3}}}
+        ))
+
+        shap_waterfall_plot.update_layout(
+            title="Shap Waterfall Plot",
+            showlegend=False
+        )
+
+        return shap_waterfall_plot
+    else:
+        raise PreventUpdate
+
+# Callback pour mettre à jour le graphique Scatter Plot
+@app.callback(
+    Output('scatter-plot', 'figure'),
+    [Input('client-dropdown', 'value'),
+     Input('feature1-dropdown', 'value'),
+     Input('feature2-dropdown', 'value')]
+)
+def update_scatter_plot(client_id, feature1, feature2):
+    if client_id is None:
+        raise PreventUpdate  # Si aucun client n'est sélectionné, empêchez la mise à jour du graphique
+
+    # Appel à l'API pour récupérer les 10 voisins
+    neighbors_api_url = f"{API_URL}clients_similaires/{client_id}"
+    response = requests.get(neighbors_api_url)
+
+    if response.status_code == 200:
+        neighbors_data = response.json()
+
+        # Obtenez les données du client
+        client_data = data_test[data_test.index == client_id]
+
+        # Obtenez les données des voisins
+        voisins_data = data_train[data_train.index.isin(neighbors_data)]
+
+        # Création d'un graphique scatter plot avec Plotly Express
+        scatter_plot = px.scatter(
+            x = voisins_data[feature1],
+            y = voisins_data[feature2],
+            color =data_train.loc[neighbors_data, 'TARGET'],  # Utilisez la variable 'TARGET' pour définir la couleur
+            color_discrete_sequence=['green', 'red'],  # Couleurs pour '0' et '1' dans 'TARGET'
+            labels ={'x': f'{feature1}', 'y': f'{feature2}', 'color': 'TARGET'},
+            title  = f'Scatter Plot des 10 Voisins du client {client_id}',
+        )
+
+        # Ajoutez le point du client choisi en rouge
+        scatter_plot.add_scatter(
+            x=client_data[feature1],
+            y=client_data[feature2],
+            mode='markers',
+            marker=dict(color='red'),
+            name='Client Choisi'
+        )
+        # Mettez à jour la mise en page pour déplacer la légende en haut à droite
+        scatter_plot.update_layout(
+            showlegend=True,
+            legend=dict(
+                x=1,  # position en x
+                y=1.07,  # position en y
+                traceorder='normal',  # ordre des éléments de légende
+            )
+        )
+        return scatter_plot
+    else:
+        raise PreventUpdate
 
 
-# @app.callback(
-#     Output('shap_graph', 'children'),
-#     [Input('start-button', 'n_clicks')],
-#     [State('client-dropdown', 'value')]
-# )
-# 
-# def update_shap_graph(client_id):
-#     if client_id is None:
-#         raise PreventUpdate  # Si aucun client n'est sélectionné, empêchez la mise à jour du graphique
-# 
-#     # Obtenez l'indice correspondant au client sélectionné (assurez-vous que data_test.index est une liste d'ID clients)
-#     client_index = data_test.index.get_loc(client_id)
-#     print(client_index)
-#     # Sélectionnez les valeurs SHAP pour le client spécifique
-#     client_data = data_test_scaled[data_test_scaled.index == client_id]
-#     print(client_data)
-#     shap_values_client = explainer.shap_values(client_data)[0][:, 1]
-# 
-#     # Créez un graphique SHAP interactif avec Plotly
-#     shap.initjs()  # Initialisation du JavaScript pour SHAP (si ce n'est pas déjà fait)
-#     shap_graph = shap.force_plot(explainer.expected_value, shap_values_client, data_test.iloc[client_index, :])
-#     # shap_graph = shap.plots.force(explainer.expected_value, shap_values_client)
-#     # Retournez le graphique SHAP pour l'onglet 'local_interpretation'
-#     return shap_graph
 
 # Point d'entrée de l'application Dash
 if __name__ == '__main__':
-    app.run_server(debug=True, # port=9000
-                   )
+    app.run(debug=True, port=8080)
