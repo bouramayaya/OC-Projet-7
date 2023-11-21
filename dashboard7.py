@@ -14,7 +14,7 @@ import numpy as np
 
 
 # URL de l'API
-API_URL = 'http://127.0.0.1:8000/'  # "http://3.84.177.36:8000/"  # Remplacez par votre URL d'API
+API_URL = 'http://3.84.177.36:8000/'  # "http://3.84.177.36:8000/"  # Remplacez par votre URL d'API
 
 
 # Chargement des données
