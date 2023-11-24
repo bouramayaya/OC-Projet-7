@@ -18,7 +18,6 @@ app = FastAPI()
 # ------------------------------------------------------------------------------------------------------------
 # Chargement du modèle et des données
 # ------------------------------------------------------------------------------------------------------------
-
 def charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele):
     url = f"https://raw.githubusercontent.com/{nom_utilisateur}/{nom_repo}/master/{chemin_fichier_modele}"
     response = requests.get(url)
@@ -35,12 +34,11 @@ def charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele):
 
 
 # Exemple d'utilisation
-nom_utilisateur = "bouramayaya"
-nom_repo = "OC-Projet-7"
-chemin_fichier_modele = "model/best_LGBMClassifier.pkl"
+# nom_utilisateur = "bouramayaya"
+# nom_repo = "OC-Projet-7"
+# chemin_fichier_modele = "model/best_LGBMClassifier.pkl"
 
-model = charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele)
-
+# model = charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele)
 
 # ------------------------------------------------------------------------------------------------------------
 # Chargement des données
@@ -73,17 +71,23 @@ nom_utilisateur = "bouramayaya"
 nom_repo = "OC-Projet-7"
 chemin_dossier = "data"
 
-data = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
-data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
-X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
-
-# path=os.getcwd()
-# os.chdir(path) # 'C:/Users/Fane0763/OpenClassroom/OC Projet 7'
-# data_train = pd.read_csv('/data/train_df.csv').set_index('SK_ID_CURR')
-# data = pd.read_csv('/data/test_df.csv').set_index('SK_ID_CURR')
-# X_train = pd.read_csv('/data/X_train.csv').set_index('SK_ID_CURR')
+# data = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
+# data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
+# X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
 
 
+
+# Reglage du repertoire de travail
+path='/home/ubuntu/OC/OC-Projet-7'
+os.chdir(path) # 'C:/Users/Fane0763/OpenClassroom/OC Projet 7'
+
+# Chargement du modèle et des données
+model = pickle.load(open('./model/best_LGBMClassifier.pkl', 'rb'))
+
+# Chargement des bases
+data_train = pd.read_csv('./data/train_df.csv').set_index('SK_ID_CURR')
+data       = pd.read_csv('./data/test_df.csv').set_index('SK_ID_CURR')
+X_train    = pd.read_csv('./data/X_train.csv').set_index('SK_ID_CURR')
 
 cols = X_train.select_dtypes(['float64']).columns
 
@@ -136,7 +140,6 @@ async def get_prediction(client_id: int):
     client_data = data_scaled[data_scaled.index == client_id]
     if client_data.empty:
         raise HTTPException(status_code=404, detail="Client data not found")
-
     info_client = client_data  # client_data.drop('SK_ID_CURR', axis=1)
     prediction = model.predict_proba(info_client)[0][1]
     return prediction
@@ -200,5 +203,6 @@ def shap_values():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 if __name__ == '__main__':
-    uvicorn.run(app, host='127.0.0.1', port=8000)
+    uvicorn.run(app, host='127.0.0.1', port=8088) 
