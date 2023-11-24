@@ -16,7 +16,7 @@ import dash_bootstrap_components as dbc
 
 
 # URL de l'API
-API_URL = 'http://127.0.0.1:8000/'  # "http://3.84.177.36:8000/"  # Remplacez par votre URL d'API
+API_URL = 'http://54.172.177.114:8000/' #'http://127.0.0.1:8000/'  # "http://3.84.177.36:8000/"  # Remplacez par votre URL d'API
 
 # ------------------------------------------------------------------------------------------------------------
 # Chargement du modèle et des données
@@ -508,4 +508,6 @@ def update_scatter_plot(client_id, feature1, feature2):
 
 # Point d'entrée de l'application Dash
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, 
+            # port=8080,
+            )
