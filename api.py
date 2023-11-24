@@ -32,13 +32,11 @@ def charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele):
         print(f"Message d'erreur complet : {response.text}")
         return None
 
+nom_utilisateur = "bouramayaya"
+nom_repo = "OC-Projet-7"
+chemin_fichier_modele = "model/best_LGBMClassifier.pkl"
 
-# Exemple d'utilisation
-# nom_utilisateur = "bouramayaya"
-# nom_repo = "OC-Projet-7"
-# chemin_fichier_modele = "model/best_LGBMClassifier.pkl"
-
-# model = charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele)
+model = charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele)
 
 # ------------------------------------------------------------------------------------------------------------
 # Chargement des données
@@ -71,23 +69,23 @@ nom_utilisateur = "bouramayaya"
 nom_repo = "OC-Projet-7"
 chemin_dossier = "data"
 
-# data = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
-# data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
-# X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
+data = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
+data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
+X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
 
 
 
-# Reglage du repertoire de travail
-path='/home/ubuntu/OC/OC-Projet-7'
-os.chdir(path) # 'C:/Users/Fane0763/OpenClassroom/OC Projet 7'
-
-# Chargement du modèle et des données
-model = pickle.load(open('./model/best_LGBMClassifier.pkl', 'rb'))
-
-# Chargement des bases
-data_train = pd.read_csv('./data/train_df.csv').set_index('SK_ID_CURR')
-data       = pd.read_csv('./data/test_df.csv').set_index('SK_ID_CURR')
-X_train    = pd.read_csv('./data/X_train.csv').set_index('SK_ID_CURR')
+# # Reglage du repertoire de travail
+# path='/home/ubuntu/OC/OC-Projet-7'
+# os.chdir(path) # 'C:/Users/Fane0763/OpenClassroom/OC Projet 7'
+# 
+# # Chargement du modèle et des données
+# model = pickle.load(open('./model/best_LGBMClassifier.pkl', 'rb'))
+# 
+# # Chargement des bases
+# data_train = pd.read_csv('./data/train_df.csv').set_index('SK_ID_CURR')
+# data       = pd.read_csv('./data/test_df.csv').set_index('SK_ID_CURR')
+# X_train    = pd.read_csv('./data/X_train.csv').set_index('SK_ID_CURR')
 
 cols = X_train.select_dtypes(['float64']).columns
 
