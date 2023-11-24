@@ -494,10 +494,10 @@ def update_scatter_plot(client_id, feature1, feature2):
         # Mettez à jour la mise en page pour déplacer la légende en haut à droite
         scatter_plot.update_layout(
             showlegend=True,
-            legend=dict(
-                x=1,  # position en x
-                y=1.07,  # position en y
-                traceorder='normal',  # ordre des éléments de légende
+            legend = dict(
+                x  = 1,  # position en x
+                y  = 1.07,  # position en y
+                traceorder = 'normal',  # ordre des éléments de légende
             )
         )
         return scatter_plot
@@ -505,9 +505,11 @@ def update_scatter_plot(client_id, feature1, feature2):
         raise PreventUpdate
 
 
-
-# Point d'entrée de l'application Dash
 if __name__ == '__main__':
-    app.run(debug=True, 
-            # port=8080,
-            )
+    app.run_server(host = '0.0.0.0', port = 8050)
+
+# # Point d'entrée de l'application Dash
+# if __name__ == '__main__':
+#     app.run(debug=True, 
+#             # port=8080,
+#             )
