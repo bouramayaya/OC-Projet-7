@@ -1,16 +1,16 @@
-# Importation des bibliothèques Dash et Plotly
+import pandas as pd
+import numpy as np
 import dash
 from dash import dcc, html
 from dash import Dash, dcc, html, Input, Output, State
 from dash.exceptions import PreventUpdate
 import plotly.express as px
 import requests
-import pandas as pd
+
 import plotly.graph_objects as go
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import pickle
 import shap
-import numpy as np
 from io import StringIO
 import dash_bootstrap_components as dbc
 
@@ -36,39 +36,11 @@ def charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele):
         print(f"Message d'erreur complet : {response.text}")
         return None
 
-
-# Exemple d'utilisation
 nom_utilisateur = "bouramayaya"
 nom_repo = "OC-Projet-7"
 chemin_fichier_modele = "model/best_LGBMClassifier.pkl"
 
 model = charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele)
-
-# ------------------------------------------------------------------------------------------------------------
-# Chargement des données
-# ------------------------------------------------------------------------------------------------------------
-def charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele):
-    url = f"https://raw.githubusercontent.com/{nom_utilisateur}/{nom_repo}/master/{chemin_fichier_modele}"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        contenu_modele = response.content
-        modele_charge = pickle.loads(contenu_modele)
-        print("Modèle chargé avec succès...")
-        return modele_charge
-    else:
-        print(f"Erreur lors de la récupération du modèle depuis GitHub. Code d'erreur : {response.status_code}")
-        print(f"Message d'erreur complet : {response.text}")
-        return None
-
-
-# Exemple d'utilisation
-nom_utilisateur = "bouramayaya"
-nom_repo = "OC-Projet-7"
-chemin_fichier_modele = "model/best_LGBMClassifier.pkl"
-
-model = charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_modele)
-
 
 # ------------------------------------------------------------------------------------------------------------
 # Chargement des données
@@ -102,25 +74,19 @@ nom_repo = "OC-Projet-7"
 chemin_dossier = "data"
 
 data_test  = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
-data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
-X_train    = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
+data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_')
+X_train    = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_')
 
-# 
-# # Chargement des données
-# import os
-# 
-# os.chdir('C:/Users/Fane0763/OpenClassroom/OC Projet 7')
-# data_train = pd.read_csv('./out_put/train_df.csv').set_index('SK_ID_CURR')
-# data_test = pd.read_csv('./out_put/test_df.csv').set_index('SK_ID_CURR')
-# X_train = pd.read_csv('./out_put/X_train.csv').set_index('SK_ID_CURR')
-# 
-# X_train = pd.read_csv('./out_put/X_train.csv').set_index('SK_ID_CURR')
+def det_dataframe(data):
+    return print(data.shape)
+
+det_dataframe(data_test)
+det_dataframe(data_train)
+det_dataframe(X_train)
+
 cols = X_train.select_dtypes(['float64']).columns
 scaler = StandardScaler()
 scaler.fit(X_train[cols])
-# 
-# # data_train_scaled = pd.read_csv('./out_put/X_train_std.csv').set_index('SK_ID_CURR')
-# # data_test_scaled = pd.read_csv('./out_put/X_test_std.csv').set_index('SK_ID_CURR')
 
 listvar = X_train.columns.tolist()
 
@@ -131,9 +97,6 @@ data_test_scaled[cols] = scaler.transform(data_test_scaled[cols])
 data_train_scaled = data_train[listvar].copy()
 data_train_scaled[cols] = scaler.transform(data_train[cols])
 
-# Chargement du modèle et des données
-model = pickle.load(open('C:/Users/Fane0763/OpenClassroom/OC Projet 7/Models/best_LGBMClassifier.pkl', 'rb'))
-
 # Initialisation de l'explainer Shapley pour les valeurs locales
 explainer = shap.Explainer(model)
 
@@ -141,7 +104,6 @@ import dash_bootstrap_components as dbc
 
 # Initialisation de l'application Dash
 # app = Dash(__name__, suppress_callback_exceptions=True)
-
 bootstrap_theme = [dbc.themes.BOOTSTRAP, 'https://use.fontawesome.com/releases/v5.9.0/css/all.css']
 app = Dash(__name__, external_stylesheets=bootstrap_theme, title="Dashboard Prêt à depenser")
 server = app.server
@@ -505,11 +467,12 @@ def update_scatter_plot(client_id, feature1, feature2):
         raise PreventUpdate
 
 
-if __name__ == '__main__':
-    app.run_server(host = '0.0.0.0', port = 8050)
-
-# # Point d'entrée de l'application Dash
 # if __name__ == '__main__':
-#     app.run(debug=True, 
-#             # port=8080,
-#             )
+#     app.run_server(debug=True, 
+#                    host = '127.0.0.1', 
+#                    port = 8050,
+#                    )
+
+# Point d'entrée de l'application Dash
+if __name__ == '__main__':
+    app.run(debug=True, port=8080)
