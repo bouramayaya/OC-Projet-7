@@ -70,8 +70,8 @@ nom_repo = "OC-Projet-7"
 chemin_dossier = "data"
 
 data = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
-data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
-X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
+data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_')
+X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_')
 
 
 
@@ -202,5 +202,5 @@ def shap_values():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# if __name__ == '__main__':
-#     uvicorn.run(app, host='127.0.0.1', port=8000) 
+if __name__ == '__main__':
+    uvicorn.run(app, host='127.0.0.1', port=8000) 
