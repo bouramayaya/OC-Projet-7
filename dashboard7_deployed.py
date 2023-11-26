@@ -52,7 +52,7 @@ def charger_et_concatener_fichiers(path, mot_cle):
 
     for fichier in os.listdir(path):
         if fichier.endswith('.csv') and mot_cle in fichier:
-            chemin_fichier = os.path.join(path, fichier)
+            chemin_fichier = f'{path}/{fichier}' # os.path.join(path, fichier)
             df = pd.read_csv(chemin_fichier)
             fichiers_csv.append(df)
 
