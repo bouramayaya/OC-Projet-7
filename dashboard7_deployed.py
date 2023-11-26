@@ -74,7 +74,7 @@ def charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_doss
 
 
 nom_utilisateur = "bouramayaya"
-nom_repo = "OC-Projet-7"
+nom_repo = "dashboard"
 chemin_dossier = "data"
 
 data_test  = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
@@ -88,32 +88,32 @@ det_dataframe(data_test)
 det_dataframe(data_train)
 det_dataframe(X_train)
 
-
-#  Charger et concatener les fichiers data
-# ---------------------------------------------------------------------------------------
-
-def charger_et_concatener_fichiers(path, mot_cle):
-    fichiers_csv = []
-
-    for fichier in os.listdir(path):
-        if fichier.endswith('.csv') and mot_cle in fichier:
-            chemin_fichier = f'{path}/{fichier}' # os.path.join(path, fichier)
-            df = pd.read_csv(chemin_fichier)
-            fichiers_csv.append(df)
-
-    if not fichiers_csv:
-        print(f"Aucun fichier contenant le mot-clé '{mot_cle}' n'a été trouvé dans le dossier.")
-        return None
-
-    dataframe_concatene = pd.concat(fichiers_csv, axis=0, ignore_index=True)
-    return dataframe_concatene.set_index('SK_ID_CURR')
-
-path  = '/home/ubuntu/OC/OC-Projet-7'
-# path = 'C:/Users/Fane0763/OpenClassroom/OC Projet 7/OC-Projet-7'
-
-data_test  = charger_et_concatener_fichiers(f'{path}/data', 'test_df')
-data_train = charger_et_concatener_fichiers(f'{path}/data', 'train_df_')
-X_train    = charger_et_concatener_fichiers(f'{path}/data', 'X_train_')
+# 
+# #  Charger et concatener les fichiers data
+# # ---------------------------------------------------------------------------------------
+# 
+# def charger_et_concatener_fichiers(path, mot_cle):
+#     fichiers_csv = []
+# 
+#     for fichier in os.listdir(path):
+#         if fichier.endswith('.csv') and mot_cle in fichier:
+#             chemin_fichier = f'{path}/{fichier}' # os.path.join(path, fichier)
+#             df = pd.read_csv(chemin_fichier)
+#             fichiers_csv.append(df)
+# 
+#     if not fichiers_csv:
+#         print(f"Aucun fichier contenant le mot-clé '{mot_cle}' n'a été trouvé dans le dossier.")
+#         return None
+# 
+#     dataframe_concatene = pd.concat(fichiers_csv, axis=0, ignore_index=True)
+#     return dataframe_concatene.set_index('SK_ID_CURR')
+# 
+# path  = '/home/ubuntu/OC/OC-Projet-7'
+# # path = 'C:/Users/Fane0763/OpenClassroom/OC Projet 7/OC-Projet-7'
+# 
+# data_test  = charger_et_concatener_fichiers(f'{path}/data', 'test_df')
+# data_train = charger_et_concatener_fichiers(f'{path}/data', 'train_df_')
+# X_train    = charger_et_concatener_fichiers(f'{path}/data', 'X_train_')
 
 print('data_test   :', data_test.shape)
 print('data_train  :', data_train.shape)
@@ -511,3 +511,39 @@ def update_scatter_plot(client_id, feature1, feature2):
 # Point d'entrée de l'application Dash
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
+
+
+# import boto3
+# import pandas as pd
+# from io import StringIO
+# 
+# # Replace these with your AWS credentials
+# aws_access_key_id = "your-aws-access-key-id"
+# aws_secret_access_key = "your-aws-secret-access-key"
+# aws_region = "your-aws-region"
+# s3_bucket_name = "your-bucket-name"
+# 
+# # Create an S3 client
+# s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=aws_region)
+# 
+# # List of CSV files in the 'data' folder
+# csv_files = [
+#     "X_test.csv", "X_train_1.csv", "X_train_2.csv", "X_train_3.csv", "X_train_4.csv", "X_train_5.csv",
+#     "X_train_6.csv", "test_df.csv", "train_df_1.csv", "train_df_2.csv", "train_df_3.csv", "train_df_4.csv",
+#     "train_df_5.csv", "train_df_6.csv", "y_test.csv", "y_train.csv"
+# ]
+# 
+# # Read each CSV file from the S3 bucket
+# for csv_file in csv_files:
+#     # Specify the S3 object key
+#     s3_object_key = f"data/{csv_file}"
+# 
+#     # Download the CSV file from S3
+#     response = s3.get_object(Bucket=s3_bucket_name, Key=s3_object_key)
+#     content = response['Body'].read().decode('utf-8')
+# 
+#     # Convert CSV content to a Pandas DataFrame
+#     df = pd.read_csv(StringIO(content))
+# 
+#     # Now 'df' contains the data from the CSV file, and you can perform further operations on it
+#     print(f"Data from {csv_file}:\n{df.head()}\n")
