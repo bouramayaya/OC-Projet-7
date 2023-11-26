@@ -63,7 +63,7 @@ def charger_et_concatener_fichiers(path, mot_cle):
     dataframe_concatene = pd.concat(fichiers_csv, axis=0, ignore_index=True)
     return dataframe_concatene.set_index('SK_ID_CURR')
 
-path  = '/home/ubuntu/OC/OC-Projet-7/'
+path  = '/home/ubuntu/OC/OC-Projet-7'
 # path = 'C:/Users/Fane0763/OpenClassroom/OC Projet 7/OC-Projet-7'
 
 data_test  = charger_et_concatener_fichiers(f'{path}/data', 'test_df')
