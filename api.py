@@ -74,7 +74,7 @@ data        = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, c
 data_train  = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1', nrows=taille)
 X_train     = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1', nrows=taille)
 
-print('data_test   :', data_test.shape)
+print('data   :', data.shape)
 
 
 
