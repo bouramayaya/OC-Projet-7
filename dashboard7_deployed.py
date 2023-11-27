@@ -78,42 +78,6 @@ data_test = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, che
 data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
 X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
 
-print(data_test.shape)
-
-def det_dataframe(data):
-    return print(data.shape)
-
-det_dataframe(data_test)
-det_dataframe(data_train)
-det_dataframe(X_train)
-
-# 
-# #  Charger et concatener les fichiers data
-# # ---------------------------------------------------------------------------------------
-# 
-# def charger_et_concatener_fichiers(path, mot_cle):
-#     fichiers_csv = []
-# 
-#     for fichier in os.listdir(path):
-#         if fichier.endswith('.csv') and mot_cle in fichier:
-#             chemin_fichier = f'{path}/{fichier}' # os.path.join(path, fichier)
-#             df = pd.read_csv(chemin_fichier)
-#             fichiers_csv.append(df)
-# 
-#     if not fichiers_csv:
-#         print(f"Aucun fichier contenant le mot-clé '{mot_cle}' n'a été trouvé dans le dossier.")
-#         return None
-# 
-#     dataframe_concatene = pd.concat(fichiers_csv, axis=0, ignore_index=True)
-#     return dataframe_concatene.set_index('SK_ID_CURR')
-# 
-# path  = '/home/ubuntu/OC/OC-Projet-7'
-# # path = 'C:/Users/Fane0763/OpenClassroom/OC Projet 7/OC-Projet-7'
-# 
-# data_test  = charger_et_concatener_fichiers(f'{path}/data', 'test_df')
-# data_train = charger_et_concatener_fichiers(f'{path}/data', 'train_df_')
-# X_train    = charger_et_concatener_fichiers(f'{path}/data', 'X_train_')
-
 print('data_test   :', data_test.shape)
 print('data_train  :', data_train.shape)
 print('X_train     :', X_train.shape)
