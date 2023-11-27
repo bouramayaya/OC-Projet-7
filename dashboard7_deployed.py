@@ -46,7 +46,7 @@ model = charger_modele_de_github(nom_utilisateur, nom_repo, chemin_fichier_model
 # ------------------------------------------------------------------------------------------------------------
 # Chargement des données
 # ------------------------------------------------------------------------------------------------------------
-def charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, mot_cle):
+def charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, mot_cle, nrows=None):
     url = f"https://api.github.com/repos/{nom_utilisateur}/{nom_repo}/contents/{chemin_dossier}"
     response = requests.get(url)
     fichiers_csv = []
@@ -56,7 +56,7 @@ def charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_doss
         for fichier in fichiers:
             if fichier["name"].lower().endswith('.csv') and mot_cle in fichier["name"]:
                 contenu = requests.get(fichier["download_url"]).text
-                dataframe = pd.read_csv(StringIO(contenu))
+                dataframe = pd.read_csv(StringIO(contenu), nrows=nrows)
                 fichiers_csv.append(dataframe)
 
         if not fichiers_csv:
@@ -74,13 +74,14 @@ nom_utilisateur = "bouramayaya"
 nom_repo = "OC-Projet-7"
 chemin_dossier = "data"
 
-data_test = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df')
-data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1')
-X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1')
+taille = 8000
+data_test = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df', nrows=taille)
+data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1', nrows=taille)
+X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1', nrows=taille)
 
 print('data_test   :', data_test.shape)
-print('data_train  :', data_train.shape)
-print('X_train     :', X_train.shape)
+# print('data_train  :', data_train.shape)
+# print('X_train     :', X_train.shape)
 
 cols = X_train.select_dtypes(['float64']).columns
 scaler = StandardScaler()
