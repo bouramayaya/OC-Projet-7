@@ -26,7 +26,7 @@ def concat_csv_files(folder_path, keyword):
 
 
 folder_path = '/home/ubuntu/OC/OC-Projet-7/data'
-folder_path = 'C:/Users/Fane0763/OpenClassroom/OC Projet 7/OC-Projet-7/data'
+# folder_path = 'C:/Users/Fane0763/OpenClassroom/OC Projet 7/OC-Projet-7/data'
 keyword = 'X_train_'
 result_df = concat_csv_files(folder_path, keyword)
 print(result_df.shape)
