@@ -3,7 +3,7 @@ import requests
 from io import StringIO
 
 # URL brute du fichier CSV sur GitHub
-github_csv_url = 'https://github.com/bouramayaya/dashboard/tree/master/data/X_train_1.csv'
+github_csv_url = 'https://github.com/bouramayaya/dashboard/blob/master/data/X_train_1.csv'
 
 # Utilisez requests pour obtenir le contenu du fichier CSV
 response = requests.get(github_csv_url)
