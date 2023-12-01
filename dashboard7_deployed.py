@@ -74,9 +74,9 @@ nom_utilisateur = "bouramayaya"
 nom_repo = "OC-Projet-7"
 chemin_dossier = "data"
 
-taille = 8000
+taille = None # 8000
 data_test = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'test_df', nrows=taille)
-data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_1', nrows=taille)
+data_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'train_df_', nrows=taille)
 X_train = charger_et_concatener_fichiers_github(nom_utilisateur, nom_repo, chemin_dossier, 'X_train_1', nrows=taille)
 
 print('data_test   :', data_test.shape)
